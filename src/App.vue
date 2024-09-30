@@ -1,7 +1,7 @@
 <!--
-*				libreevent - App.vue
+*				batu-ui - App.vue
 *
-*	Created by Janis Hutz 05/14/2023, Licensed under the GPL V3 License
+*	Created by Janis Hutz 09/30/2024, Licensed under the GPL V3 License
 *			https://janishutz.com, development@janishutz.com
 *
 *
@@ -9,6 +9,7 @@
 
 <script setup lang="ts">
     import { ref } from 'vue';
+    import stopSlider from './components/stopSlider.vue';
 
     const theme = ref( 'light_mode' );
 
@@ -76,6 +77,12 @@
             alert( 'Error logging in. Please retry!' )
         } ); 
     }
+
+    const keyDownHandler = ( e: KeyboardEvent ) => {
+        if ( e.key === 'Enter' ) {
+            unlock();
+        }
+    }
 </script>
 
 <template>
@@ -83,18 +90,26 @@
         <button @click="changeTheme();" id="themeSelector" title="Toggle between light and dark mode"><span class="material-symbols-outlined" v-html="theme"></span></button>
         <main>
             <h1>Smoke Data Recorder</h1>
-            <div v-if="unlocked"></div>
-            <div v-else>
-                <p>Please log in</p>
-                <div v-if="!showPW">
-                    <input type="password" placeholder="Password" class="input" v-model="pw">
-                    <button class="transparent-button" @click="togglePWShow()"><span class="material-symbols-outlined">visibility</span></button><br>
+            <div v-if="!isLoading">
+                <div v-if="unlocked">
+                    <input type="text" class="input" placeholder="">
+                    <stopSlider id="test" style="width: 80vw; margin-left: 20px;"></stopSlider>
                 </div>
                 <div v-else>
-                    <input type="text" placeholder="Password" class="input" v-model="pw">
-                    <button class="transparent-button" @click="togglePWShow()"><span class="material-symbols-outlined">visibility_off</span></button><br>
+                    <p>Please log in</p>
+                    <div v-if="!showPW">
+                        <input type="password" placeholder="Password" class="input" v-model="pw" @keydown="( e ) => keyDownHandler( e )">
+                        <button class="transparent-button" @click="togglePWShow()"><span class="material-symbols-outlined">visibility</span></button><br>
+                    </div>
+                    <div v-else>
+                        <input type="text" placeholder="Password" class="input" v-model="pw" @keydown="( e ) => keyDownHandler( e )">
+                        <button class="transparent-button" @click="togglePWShow()"><span class="material-symbols-outlined">visibility_off</span></button><br>
+                    </div>
+                    <button @click="unlock()" class="fancy-button" style="margin-top: 10px;">Login</button>
                 </div>
-                <button @click="unlock()" class="fancy-button" style="margin-top: 10px;">Login</button>
+            </div>
+            <div v-else>
+                Loading...
             </div>
         </main>
     </div>
@@ -168,7 +183,7 @@
     }
 
     #app {
-        transition: 0.5s;
+        transition: all 0.5s;
         background-color: var( --background-color );
         font-family: 'Plus Jakarta Sans', sans-serif;
         /* font-family: Avenir, Helvetica, Arial, sans-serif; */
