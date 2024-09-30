@@ -33,6 +33,18 @@
         }
     }
 
+    const startDrag = ( x: number ) => {
+
+    }
+
+    const handleDrag = ( x: number ) => {
+
+    }
+
+    const endDrag = () => {
+
+    }
+
     const props = defineProps( {
         'id': {
             default: '1',
@@ -40,6 +52,7 @@
             type: String
         }
     } );
+
 
     defineExpose( {
         setUp
@@ -53,7 +66,10 @@
 
 <template>
     <div class="slider-container">
-        <div class="slider-knob" :style="'left: ' + sliderFillPosLeft + 'px;'"></div>
+        <div class="slider-knob" :style="'left: ' + sliderFillPosLeft + 'px;'"
+            @mousedown="( e ) => startDrag( e.clientX )" @mousemove="( e ) => handleDrag( e.clientX )"
+            @mouseup="( e ) => endDrag()"></div>
+
         <div class="slider-stop" v-for="stop in sliderStops" v-bind:key="stop.index" :style="'left: ' + stop.x + 'px;'"></div>
         <div class="slider" :id="'slider-' + $props.id">
             <div class="slider-fill" :style="'left: ' + sliderFillPosLeft + 'px; width: ' + ( maxWidth - sliderFillPosLeft - sliderFillPosRight ) + 'px'"></div>
