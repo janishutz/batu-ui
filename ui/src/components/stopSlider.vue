@@ -101,6 +101,10 @@
     setTimeout( () => {
         emits( 'ready', true );
     } );
+
+    window.addEventListener( 'resize', () => {
+        setUp( sliderStops.value.length, sliderIndex.value );
+    } );
 </script>
 
 

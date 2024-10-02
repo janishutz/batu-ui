@@ -8,12 +8,12 @@
 -->
 
 <script setup lang="ts">
-    import { ref } from 'vue';
+    import { ref, type Ref } from 'vue';
     import stopSlider from './components/stopSlider.vue';
     import VueDatePicker from '@vuepic/vue-datepicker';
     import '@vuepic/vue-datepicker/dist/main.css'
 
-    const date = ref();
+    const date: Ref<Date | undefined> = ref();
 
     const theme = ref( 'light_mode' );
 
@@ -45,10 +45,11 @@
     const showPW = ref( false );
     const isLoading = ref( false );
 
-    fetch( localStorage.getItem( 'url' ) + '/batu/check', { credentials: 'include' } ).then( res => {
+    fetch( localStorage.getItem( 'url' ) + '/check', { credentials: 'include' } ).then( res => {
         isLoading.value = false;
         if ( res.status === 200 ) {
             unlocked.value = true;
+            fetchOldData();
         }
     } ).catch( e => {
         isLoading.value = false;
@@ -61,7 +62,7 @@
     }
 
     const unlock = () => {
-        fetch( localStorage.getItem( 'url' ) + '/batu/unlock', {
+        fetch( localStorage.getItem( 'url' ) + '/unlock', {
             method: 'post',
             body: JSON.stringify( { 'password': pw.value } ),
             credentials: 'include',
@@ -72,6 +73,7 @@
         } ).then( res => {
             if ( res.status === 200 ) {
                 unlocked.value = true;
+                fetchOldData();
             } else {
                 alert( 'Password incorrect' );
                 unlocked.value = false;
@@ -87,34 +89,78 @@
             unlock();
         }
     }
-
-    const difficulty = ref( 0 );
-    const difficultyLevels = ref( [ 'sleep sessions', 'very easy', 'easy', 'of medium difficulty', 'hard', 'very hard', 'impossible to comprehend' ] );
+    
+    const hasSelectedDate = ref( false );
+    const difficulty = ref( -1 );
+    const difficultyLevels = ref( [ 
+        'sleep sessions', 
+        'very easy', 
+        'easy', 
+        'of medium difficulty', 
+        'hard', 
+        'very hard', 
+        'impossible to comprehend' 
+    ] );
     const difficultySlider = ref( stopSlider );
     const setDifficulty = ( value: number ) => {
         difficulty.value = value;
     }
 
-    const rest = ref( 0 );
-    const restLevels = ref( [ 'so tired I fell asleep again', 'very tired', 'tired', 'decently rested', 'well-rested', 'very well-rested', 'very energized and incredibly well-rested' ] );
+    const rest = ref( -1 );
+    const restLevels = ref( [ 
+        'very energized and incredibly well-rested',
+        'very well-rested', 
+        'well-rested', 
+        'decently rested', 
+        'tired', 
+        'very tired', 
+        'so tired I fell asleep again'
+    ] );
     const restSlider = ref( stopSlider );
 
-    const hasSelectedDate = ref( false );
 
     const setRest = ( value: number ) => {
         rest.value = value;
     }
 
-    const setUpDifficultySlider = () => {
-        setTimeout( () => {
-            difficultySlider.value.setUp( 7, 3 );
-        }, 500 );
+    const stress = ref( -1 );
+    const stressLevels = ref( [ 
+        'so low I thought I had holidays', 
+        'low', 
+        'below average', 
+        'average', 
+        'above average', 
+        'high', 
+        'so high I felt like I was never going to fail my studies' 
+    ] );
+    const stressSlider = ref( stopSlider );
+
+    const cigaretCount = ref( 0 );
+    const sleepHours = ref( 0 );
+
+
+
+    const setStress = ( value: number ) => {
+        stress.value = value;
     }
 
+    
     const setUpRestSlider = () => {
         setTimeout( () => {
             restSlider.value.setUp( 7, 3 );
         }, 500 );
+    }
+
+    const setUpDifficultySlider = () => {
+        setTimeout( () => {
+            difficultySlider.value.setUp( 7, 3 );
+        }, 1000 );
+    }
+
+    const setUpStressSlider = () => {
+        setTimeout( () => {
+            stressSlider.value.setUp( 7, 3 );
+        }, 1500 );
     }
 
     const showStats = () => {
@@ -126,8 +172,39 @@
     }
 
     const dateUpdatedHandler = () => {
-        hasSelectedDate.value = true;
-        // TODO: Load old data, if present
+        console.log( date.value );
+        if ( date.value ) {
+            hasSelectedDate.value = true;
+            // TODO: Load old data, if present
+
+            if ( oldData[ date.value.toISOString() ] ) {
+                // TODO: Finish
+            }
+        } else {
+            hasSelectedDate.value = false;
+        }
+    }
+
+
+    interface OldData {
+        [key: string]: object;
+    }
+
+    let oldData: OldData = {};
+
+    const fetchOldData = () => {
+        fetch( localStorage.getItem( 'url' ) + '/get', { credentials: 'include' } ).then( res => {
+            if ( res.status === 200 ) {
+                res.json().then( json => {
+                    oldData = json;
+                } );
+            } else {
+                alert( `Failed to load old data. Features are limited. Please reload to try again! (${ res.status })` );
+            }
+        } ).catch( e => {
+            console.error( e );
+            alert( 'Failed to load old data. Features are limited. Please reload to try again! (details in console)' );
+        } );
     }
 </script>
 
@@ -141,29 +218,34 @@
                     <button class="fancy-button" @click="showStats()">Stats</button>
                     <div class="input-element">
                         <p>Date for which this form is filled out</p>
-                        <VueDatePicker v-model="date" :dark="theme === 'dark_mode'" @date-update="dateUpdatedHandler()"></VueDatePicker>
+                        <VueDatePicker v-model="date" :dark="theme === 'dark_mode'" @closed="dateUpdatedHandler()" @cleared="dateUpdatedHandler()" :enable-time-picker="false"></VueDatePicker>
                     </div>
 
                     <div v-if="hasSelectedDate" class="main-interface">
 
                         <div class="input-element">
                             <p>How many cigarets did you smoke on that day?</p>
-                            <input type="number" class="input">
+                            <input type="number" class="input" v-model="cigaretCount">
                         </div>
                         
                         <div class="input-element">
                             <p>How many hours of sleep did you get approximately?</p>
-                            <input type="number" class="input">
+                            <input type="number" class="input" v-model="sleepHours">
                         </div>
                         
                         <div class="input-element">
-                            <p>That morning, I felt {{ restLevels[ rest ] }}</p>
-                            <stopSlider slider-id="rest" style="width: 80vw; margin-left: 20px;" @slider-pos="( pos ) => setRest( pos )" ref="restSlider" @ready="setUpRestSlider()"></stopSlider>
+                            <p>That morning, I felt {{ rest >= 0 ? restLevels[ rest ] : '...' }}</p>
+                            <stopSlider slider-id="rest" style="width: 50vw;" @slider-pos="( pos ) => setRest( pos )" ref="restSlider" @ready="setUpRestSlider()"></stopSlider>
                         </div>
                         
                         <div class="input-element">
-                            <p>The lectures on this day were {{ difficultyLevels[ difficulty ] }}</p>
-                            <stopSlider slider-id="difficulty" style="width: 80vw; margin-left: 20px;" @slider-pos="( pos ) => setDifficulty( pos )" ref="difficultySlider" @ready="setUpDifficultySlider()"></stopSlider>
+                            <p>The lectures on this day were {{ difficulty >= 0 ? difficultyLevels[ difficulty ] : '...' }}</p>
+                            <stopSlider slider-id="difficulty" style="width: 50vw;" @slider-pos="( pos ) => setDifficulty( pos )" ref="difficultySlider" @ready="setUpDifficultySlider()"></stopSlider>
+                        </div>
+
+                        <div class="input-element">
+                            <p>That day, my stress level was {{ stress >= 0 ? stressLevels[ stress ] : '...' }}</p>
+                            <stopSlider slider-id="stress" style="width: 50vw;" @slider-pos="( pos ) => setStress( pos )" ref="stressSlider" @ready="setUpStressSlider()"></stopSlider>
                         </div>
                         <button @click="submitForm()" class="fancy-button" style="margin-top: 20px;">Submit</button>
                     </div>
@@ -194,12 +276,14 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
+        width: 100vw;
     }
 </style>
 
 <style>
     body {
         background-color: var( --background-color );
+        user-select: none;
     }
 
     :root, :root.light {
@@ -274,8 +358,6 @@
     #app {
         transition: all 0.5s;
         background-color: var( --background-color );
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        /* font-family: Avenir, Helvetica, Arial, sans-serif; */
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         text-align: center;
