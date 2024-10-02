@@ -17,7 +17,8 @@
     }
 
     const maxWidth = ref( window.innerWidth ); // TODO: Update to reflect slider width
-    const sliderFillPosLeft = ref( -11 ); // Offset from left edge
+    const sliderOffset = -11;
+    const sliderFillPosLeft = ref( sliderOffset ); // Offset from left edge
     const sliderFillPosRight = ref( 0 ); // Offset from right edge
     const sliderStops: Ref<SliderStop[]> = ref( [] );
 
@@ -29,20 +30,36 @@
             sliderStops.value.push( {
                 x: intervalSize * i - 10,
                 index: i,
-            } )
+            } );
         }
     }
 
-    const startDrag = ( x: number ) => {
+    const xOffset = ref( 0 );
+    const isDragging = ref( false );
+    const sliderKnobPos = ref( sliderOffset );
+    let originalSliderPos = sliderOffset;
 
+    const startDrag = ( x: number ) => {
+        xOffset.value = x;
+        isDragging.value = true;
+        originalSliderPos = sliderKnobPos.value;
     }
 
     const handleDrag = ( x: number ) => {
-
+        if ( isDragging.value ) {
+            const newPos = originalSliderPos + ( x - xOffset.value );
+            if ( newPos <= ( maxWidth.value + sliderOffset ) && newPos >= sliderOffset ) {
+                sliderKnobPos.value = newPos;
+            } else if ( newPos < sliderOffset ) {
+                sliderKnobPos.value = sliderOffset;
+            } else {
+                sliderKnobPos.value = maxWidth.value + sliderOffset;
+            }
+        }
     }
 
     const endDrag = () => {
-
+        isDragging.value = false;
     }
 
     const props = defineProps( {
@@ -66,9 +83,11 @@
 
 <template>
     <div class="slider-container">
-        <div class="slider-knob" :style="'left: ' + sliderFillPosLeft + 'px;'"
-            @mousedown="( e ) => startDrag( e.clientX )" @mousemove="( e ) => handleDrag( e.clientX )"
-            @mouseup="( e ) => endDrag()"></div>
+        <div class="slider-knob" :style="'left: ' + sliderKnobPos + 'px;'">
+            <div :class="'slider-drag-support' + ( isDragging ? ' dragging' : '' )" @mousemove="( e ) => handleDrag( e.clientX )"
+                @mouseup="() => endDrag()" @mousedown="( e ) => startDrag( e.clientX )"></div>
+        </div>
+
 
         <div class="slider-stop" v-for="stop in sliderStops" v-bind:key="stop.index" :style="'left: ' + stop.x + 'px;'"></div>
         <div class="slider" :id="'slider-' + $props.id">
@@ -94,6 +113,23 @@
         top: -7px;
     }
 
+    .slider-drag-support {
+        width: 100%;
+        height: 100%;
+        border-radius: 50px;
+        background: none;
+        cursor: pointer;
+    }
+
+
+    .slider-drag-support.dragging {
+        position: fixed;
+        cursor: move;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+    }
 
     .slider {
         width: 100%;
