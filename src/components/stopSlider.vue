@@ -21,10 +21,11 @@
     const sliderFillPosLeft = ref( sliderOffset ); // Offset from left edge
     const sliderFillPosRight = ref( maxWidth.value ); // Offset from right edge
     const sliderStops: Ref<SliderStop[]> = ref( [] );
+    const sliderIndex = ref( 0 );
     let intervalSize = 0;
 
-    const setUp = ( stops: number ) => {
-        maxWidth.value = document.getElementById( 'slider-' + props.id )!.clientWidth;
+    const setUp = ( stops: number, preset?: number ) => {
+        maxWidth.value = document.getElementById( 'slider-' + props[ 'slider-id' ] )!.clientWidth;
         sliderStops.value = [];
         intervalSize = maxWidth.value / ( stops - 1 );
         for ( let i = 0; i < stops; i ++ ) {
@@ -33,6 +34,8 @@
                 index: i,
             } );
         }
+
+        setSliderIndex( preset ?? 0 );
     }
 
     const xOffset = ref( 0 );
@@ -44,6 +47,13 @@
         xOffset.value = x;
         isDragging.value = true;
         originalSliderPos = sliderKnobPos.value;
+    }
+
+    const setSliderIndex = ( index: number ) => {
+        sliderIndex.value = index ?? 0;
+        sliderKnobPos.value = sliderIndex.value * intervalSize + sliderOffset;
+        sliderFillPosRight.value = maxWidth.value - sliderIndex.value * intervalSize;
+        emits( 'slider-pos', sliderIndex.value );
     }
 
     const handleDrag = ( x: number ) => {
@@ -58,7 +68,9 @@
             }
 
             // Calculate progress of slider background / progress bar
-            sliderFillPosRight.value = maxWidth.value - Math.round( sliderKnobPos.value / intervalSize ) * intervalSize + sliderOffset;
+            sliderIndex.value = Math.round( sliderKnobPos.value / intervalSize );
+            sliderFillPosRight.value = maxWidth.value - sliderIndex.value * intervalSize;
+            emits( 'slider-pos', sliderIndex.value );
         }
     }
 
@@ -66,11 +78,14 @@
         isDragging.value = false;
 
         // snapping
-        sliderKnobPos.value = Math.round( sliderKnobPos.value / intervalSize ) * intervalSize + sliderOffset;
+        sliderIndex.value = Math.round( sliderKnobPos.value / intervalSize );
+        sliderFillPosRight.value = maxWidth.value - sliderIndex.value * intervalSize;
+        sliderKnobPos.value = sliderIndex.value * intervalSize + sliderOffset;
+        emits( 'slider-pos', sliderIndex.value );
     }
 
     const props = defineProps( {
-        'id': {
+        'slider-id': {
             default: '1',
             required: true,
             type: String
@@ -82,9 +97,10 @@
         setUp
     } );
 
+    const emits = defineEmits( [ 'slider-pos', 'ready' ] );
     setTimeout( () => {
-        setUp( 5 );
-    }, 500 );
+        emits( 'ready', true );
+    } );
 </script>
 
 
@@ -96,10 +112,14 @@
         </div>
 
 
-        <div class="slider-stop" v-for="stop in sliderStops" v-bind:key="stop.index" :style="'left: ' + stop.x + 'px;'"></div>
-        <div class="slider" :id="'slider-' + $props.id">
+        <div :class="'slider-stop' + ( stop.index <= sliderIndex ? ' stop-filled' : '' )" 
+            v-for="stop in sliderStops" v-bind:key="stop.index" :style="'left: ' + stop.x + 'px;'"
+            @click="setSliderIndex( stop.index )"></div>
+        <div class="slider" :id="'slider-' + $props[ 'slider-id' ]">
             <div class="slider-fill" :style="'left: ' + sliderFillPosLeft + 'px; width: ' + ( maxWidth - sliderFillPosLeft - sliderFillPosRight ) + 'px'"></div>
-            <div class="slider-stop-fill" v-for="stop in sliderStops" v-bind:key="stop.index" :style="'left: ' + stop.x + 'px;'"></div>
+            <div :class="'slider-stop-fill' + ( stop.index <= sliderIndex ? ' stop-filled' : '' )" 
+                v-for="stop in sliderStops" v-bind:key="stop.index" :style="'left: ' + stop.x + 'px;'"
+                @click="setSliderIndex( stop.index )"></div>
         </div>
     </div>
 </template>
@@ -167,8 +187,10 @@
         border: solid 2px var( --gray-color );
         position: absolute;
         top: -5px;
+        transition: background-color 0.5s;
+        cursor: pointer;
     }
-
+    
     .slider-stop-fill {
         border-radius: 10px;
         width: 20px;
@@ -177,5 +199,11 @@
         position: absolute;
         top: -5px;
         background-color: var( --background-color );
+        transition: background-color 0.5s;
+        cursor: pointer;
+    }
+    
+    .stop-filled {
+        background-color: var( --slider-color );
     }
 </style>

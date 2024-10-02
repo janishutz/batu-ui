@@ -10,6 +10,10 @@
 <script setup lang="ts">
     import { ref } from 'vue';
     import stopSlider from './components/stopSlider.vue';
+    import VueDatePicker from '@vuepic/vue-datepicker';
+    import '@vuepic/vue-datepicker/dist/main.css'
+
+    const date = ref();
 
     const theme = ref( 'light_mode' );
 
@@ -83,17 +87,86 @@
             unlock();
         }
     }
+
+    const difficulty = ref( 0 );
+    const difficultyLevels = ref( [ 'sleep sessions', 'very easy', 'easy', 'of medium difficulty', 'hard', 'very hard', 'impossible to comprehend' ] );
+    const difficultySlider = ref( stopSlider );
+    const setDifficulty = ( value: number ) => {
+        difficulty.value = value;
+    }
+
+    const rest = ref( 0 );
+    const restLevels = ref( [ 'so tired I fell asleep again', 'very tired', 'tired', 'decently rested', 'well-rested', 'very well-rested', 'very energized and incredibly well-rested' ] );
+    const restSlider = ref( stopSlider );
+
+    const hasSelectedDate = ref( false );
+
+    const setRest = ( value: number ) => {
+        rest.value = value;
+    }
+
+    const setUpDifficultySlider = () => {
+        setTimeout( () => {
+            difficultySlider.value.setUp( 7, 3 );
+        }, 500 );
+    }
+
+    const setUpRestSlider = () => {
+        setTimeout( () => {
+            restSlider.value.setUp( 7, 3 );
+        }, 500 );
+    }
+
+    const showStats = () => {
+        alert( 'Coming soon!' );
+    }
+
+    const submitForm = () => {
+        alert( 'Data submitted. Remember: Stop smoking! Smoking hurts your health!' );
+    }
+
+    const dateUpdatedHandler = () => {
+        hasSelectedDate.value = true;
+        // TODO: Load old data, if present
+    }
 </script>
 
 <template>
     <div>
         <button @click="changeTheme();" id="themeSelector" title="Toggle between light and dark mode"><span class="material-symbols-outlined" v-html="theme"></span></button>
         <main>
-            <h1>Smoke Data Recorder</h1>
+            <h1 id="title">Smoke Data Recorder</h1>
             <div v-if="!isLoading">
-                <div v-if="unlocked">
-                    <input type="text" class="input" placeholder="">
-                    <stopSlider id="test" style="width: 80vw; margin-left: 20px;"></stopSlider>
+                <div v-if="unlocked" class="main-interface">
+                    <button class="fancy-button" @click="showStats()">Stats</button>
+                    <div class="input-element">
+                        <p>Date for which this form is filled out</p>
+                        <VueDatePicker v-model="date" :dark="theme === 'dark_mode'" @date-update="dateUpdatedHandler()"></VueDatePicker>
+                    </div>
+
+                    <div v-if="hasSelectedDate" class="main-interface">
+
+                        <div class="input-element">
+                            <p>How many cigarets did you smoke on that day?</p>
+                            <input type="number" class="input">
+                        </div>
+                        
+                        <div class="input-element">
+                            <p>How many hours of sleep did you get approximately?</p>
+                            <input type="number" class="input">
+                        </div>
+                        
+                        <div class="input-element">
+                            <p>That morning, I felt {{ restLevels[ rest ] }}</p>
+                            <stopSlider slider-id="rest" style="width: 80vw; margin-left: 20px;" @slider-pos="( pos ) => setRest( pos )" ref="restSlider" @ready="setUpRestSlider()"></stopSlider>
+                        </div>
+                        
+                        <div class="input-element">
+                            <p>The lectures on this day were {{ difficultyLevels[ difficulty ] }}</p>
+                            <stopSlider slider-id="difficulty" style="width: 80vw; margin-left: 20px;" @slider-pos="( pos ) => setDifficulty( pos )" ref="difficultySlider" @ready="setUpDifficultySlider()"></stopSlider>
+                        </div>
+                        <button @click="submitForm()" class="fancy-button" style="margin-top: 20px;">Submit</button>
+                    </div>
                 </div>
                 <div v-else>
                     <p>Please log in</p>
@@ -114,6 +187,15 @@
         </main>
     </div>
 </template>
+
+<style>
+    .main-interface {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+</style>
 
 <style>
     body {
@@ -173,6 +255,12 @@
         color: white;
     }
 
+    #title {
+        font-family: "Qwitcher Grypen", cursive;
+        font-weight: 700;
+        font-size: 5rem;
+    }
+
     html,
     body {
         width: 100%;
@@ -180,6 +268,7 @@
         margin: 0;
         padding: 0;
         font-size: 17px;
+        font-family: "Jost", sans-serif;
     }
 
     #app {
