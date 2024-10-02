@@ -19,13 +19,14 @@
     const maxWidth = ref( window.innerWidth ); // TODO: Update to reflect slider width
     const sliderOffset = -11;
     const sliderFillPosLeft = ref( sliderOffset ); // Offset from left edge
-    const sliderFillPosRight = ref( 0 ); // Offset from right edge
+    const sliderFillPosRight = ref( maxWidth.value ); // Offset from right edge
     const sliderStops: Ref<SliderStop[]> = ref( [] );
+    let intervalSize = 0;
 
     const setUp = ( stops: number ) => {
         maxWidth.value = document.getElementById( 'slider-' + props.id )!.clientWidth;
         sliderStops.value = [];
-        const intervalSize = maxWidth.value / ( stops - 1 );
+        intervalSize = maxWidth.value / ( stops - 1 );
         for ( let i = 0; i < stops; i ++ ) {
             sliderStops.value.push( {
                 x: intervalSize * i - 10,
@@ -55,11 +56,17 @@
             } else {
                 sliderKnobPos.value = maxWidth.value + sliderOffset;
             }
+
+            // Calculate progress of slider background / progress bar
+            sliderFillPosRight.value = maxWidth.value - Math.round( sliderKnobPos.value / intervalSize ) * intervalSize + sliderOffset;
         }
     }
 
     const endDrag = () => {
         isDragging.value = false;
+
+        // snapping
+        sliderKnobPos.value = Math.round( sliderKnobPos.value / intervalSize ) * intervalSize + sliderOffset;
     }
 
     const props = defineProps( {
@@ -83,7 +90,7 @@
 
 <template>
     <div class="slider-container">
-        <div class="slider-knob" :style="'left: ' + sliderKnobPos + 'px;'">
+        <div :class="'slider-knob' + ( isDragging ? ' dragging' : '' )" :style="'left: ' + sliderKnobPos + 'px;'">
             <div :class="'slider-drag-support' + ( isDragging ? ' dragging' : '' )" @mousemove="( e ) => handleDrag( e.clientX )"
                 @mouseup="() => endDrag()" @mousedown="( e ) => startDrag( e.clientX )"></div>
         </div>
@@ -104,13 +111,18 @@
     }
 
     .slider-knob {
-        background-color: var( --slider-color );
+        background-color: var( --hover-color );
         width: 25px;
         height: 25px;
         border-radius: 15px;
         position: absolute;
         z-index: 5;
         top: -7px;
+        transition: left 0.5s;
+    }
+
+    .slider-knob.dragging {
+        transition: none;
     }
 
     .slider-drag-support {
@@ -142,8 +154,10 @@
     }
 
     .slider-fill {
-        height: 5px;
+        height: 10px;
         position: absolute;
+        background-color: var( --slider-color );
+        transition: width 0.5s;
     }
 
     .slider-stop {
