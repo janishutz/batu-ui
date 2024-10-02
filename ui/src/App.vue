@@ -93,7 +93,7 @@
     const hasSelectedDate = ref( false );
     const difficulty = ref( -1 );
     const difficultyLevels = ref( [ 
-        'sleep sessions', 
+        'sleep therapy', 
         'very easy', 
         'easy', 
         'of medium difficulty', 
@@ -131,18 +131,36 @@
         'average', 
         'above average', 
         'high', 
-        'so high I felt like I was never going to fail my studies' 
+        'so high I felt like I would certainly fail my studies' 
     ] );
     const stressSlider = ref( stopSlider );
+
+    const setStress = ( value: number ) => {
+        stress.value = value;
+    }
+
+
+    const freeTime = ref( -1 );
+    const freeTimeLevels = ref( [ 
+        'a lot of free time', 
+        'quite a bit of free time',
+        'some free time', 
+        'little free time', 
+        'no free time', 
+    ] );
+    const freeTimeSlider = ref( stopSlider );
+
+    const setFreeTime = ( value: number ) => {
+        freeTime.value = value;
+    }
+
 
     const cigaretCount = ref( 0 );
     const sleepHours = ref( 0 );
 
 
 
-    const setStress = ( value: number ) => {
-        stress.value = value;
-    }
+    
 
     
     const setUpRestSlider = () => {
@@ -163,22 +181,47 @@
         }, 1500 );
     }
 
+    const setUpFreeTimeSlider = () => {
+        setTimeout( () => {
+            freeTimeSlider.value.setUp( 5, 2 );
+        }, 2000 );
+    }
+    
+
     const showStats = () => {
         alert( 'Coming soon!' );
     }
 
     const submitForm = () => {
+        if ( date.value && difficulty.value > -1 && stress.value > -1 && rest.value > -1 && cigaretCount.value >= 0 && sleepHours.value >= 0 ) {
+            if ( sleepHours.value < 2 ) {
+                if ( confirm( 'Are you sure you have entered the right number of sleep hours? Do you want to proceed with the entered ' + sleepHours.value + ' hours of sleep?' ) ) {
+                    sendForm();
+                }
+            } else {
+                sendForm();
+            }
+        } else {
+            alert( 'Some entries are missing. Please fill them out before saving!' );
+        }
+    }
+
+    const sendForm = () => {
         alert( 'Data submitted. Remember: Stop smoking! Smoking hurts your health!' );
     }
 
     const dateUpdatedHandler = () => {
         console.log( date.value );
         if ( date.value ) {
-            hasSelectedDate.value = true;
-            // TODO: Load old data, if present
-
-            if ( oldData[ date.value.toISOString() ] ) {
-                // TODO: Finish
+            if ( date.value.getTime() <= new Date().getTime() + 10000 ) {
+                hasSelectedDate.value = true;
+                // TODO: Load old data, if present
+                
+                if ( oldData[ date.value.toISOString() ] ) {
+                    // TODO: Finish
+                }
+            } else {
+                alert( 'Nice job, diviner, you just predicted the future. But since we are not at Hogwarts School of Witchcraft and Wizardry, we do not believe in this subject... They do not even really' )
             }
         } else {
             hasSelectedDate.value = false;
@@ -210,6 +253,7 @@
 
 <template>
     <div>
+        <a id="github-link" href="https://github.com/janishutz/batu-ui" target="_blank"><img :src="theme === 'dark_mode' ? '/github-mark-white.svg' : '/github-mark.svg'" alt="GitHub Logo"></a>
         <button @click="changeTheme();" id="themeSelector" title="Toggle between light and dark mode"><span class="material-symbols-outlined" v-html="theme"></span></button>
         <main>
             <h1 id="title">Smoke Data Recorder</h1>
@@ -247,6 +291,11 @@
                             <p>That day, my stress level was {{ stress >= 0 ? stressLevels[ stress ] : '...' }}</p>
                             <stopSlider slider-id="stress" style="width: 50vw;" @slider-pos="( pos ) => setStress( pos )" ref="stressSlider" @ready="setUpStressSlider()"></stopSlider>
                         </div>
+
+                        <div class="input-element">
+                            <p>That day, I had {{ freeTime >= 0 ? freeTimeLevels[ freeTime ] : '...' }}</p>
+                            <stopSlider slider-id="freeTime" style="width: 50vw;" @slider-pos="( pos ) => setFreeTime( pos )" ref="freeTimeSlider" @ready="setUpFreeTimeSlider()"></stopSlider>
+                        </div>
                         <button @click="submitForm()" class="fancy-button" style="margin-top: 20px;">Submit</button>
                     </div>
                 </div>
@@ -277,6 +326,30 @@
         align-items: center;
         flex-direction: column;
         width: 100vw;
+    }
+
+    #github-link {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        color: var( --primary-color );
+        cursor: pointer;
+        height: 2rem;
+        width: 2rem;
+    }
+
+    #github-link img {
+        width: 100%;
+        height: 100%;
+    }
+
+    .input-element {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
     }
 </style>
 

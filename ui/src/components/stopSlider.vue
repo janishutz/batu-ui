@@ -112,7 +112,9 @@
     <div class="slider-container">
         <div :class="'slider-knob' + ( isDragging ? ' dragging' : '' )" :style="'left: ' + sliderKnobPos + 'px;'">
             <div :class="'slider-drag-support' + ( isDragging ? ' dragging' : '' )" @mousemove="( e ) => handleDrag( e.clientX )"
-                @mouseup="() => endDrag()" @mousedown="( e ) => startDrag( e.clientX )"></div>
+                @mouseup="() => endDrag()" @mousedown="( e ) => startDrag( e.clientX )"
+                @touchstart="( e ) => startDrag( e.touches[ 0 ].clientX )"
+                @touchend="() => endDrag()" @touchmove="( e ) => handleDrag( e.touches[ 0 ].clientX )"></div>
         </div>
 
 

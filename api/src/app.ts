@@ -5,32 +5,32 @@ import fs from 'node:fs';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
-declare let __dirname: string | undefined
-if ( typeof( __dirname ) === 'undefined' ) {
+declare let __dirname: string | undefined;
+if ( typeof __dirname === 'undefined' ) {
     __dirname = path.resolve( path.dirname( '' ) );
 }
 
 declare module 'express-session' {
     interface SessionData {
-        isAuth: boolean;
+ 'isAuth': boolean;
     }
 }
 
 const run = () => {
-    let app = express();
-    app.use( expressSession ( {
-        secret: 'oasdvövböoweivaöiewväiweväowecäievwoaweävciwecfwegifwp9uiqc32p9qc',
-        resave: true,
-        saveUninitialized: true
+    const app = express();
+    app.use( expressSession( {
+        'secret': 'oasdvövböoweivaöiewväiweväowecäievwoaweävciwecfwegifwp9uiqc32p9qc',
+        'resave': true,
+        'saveUninitialized': true
     } ) );
 
     app.use( cors( {
-        origin: true,
-        credentials: true,
+        'origin': true,
+        'credentials': true,
     } ) );
     app.set( 'trust proxy', 1 );
 
-    app.use( bodyParser.urlencoded( { extended: false } ) );
+    app.use( bodyParser.urlencoded( { 'extended': false } ) );
     app.use( bodyParser.json() );
 
 
@@ -74,7 +74,7 @@ const run = () => {
             const body = request.body;
 
             // Data points:
-            /* 
+            /*
                 day: string;
                 count: number;
                 difficulty: number;
@@ -99,14 +99,12 @@ const run = () => {
     } );
 
     app.use( ( request: express.Request, response: express.Response ) => {
-        response.status( 404 ).send( 'ERR_NOT_FOUND' ) 
+        response.status( 404 ).send( 'ERR_NOT_FOUND' );
     } );
 
 
     const PORT = process.env.PORT || 8080;
     app.listen( PORT );
-}
+};
 
-export default {
-    run
-}
+export default { run };
