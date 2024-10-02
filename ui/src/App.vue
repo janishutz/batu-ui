@@ -226,7 +226,7 @@
                     'I see you think you have the inner eye. No magical creature can stop you from predicting the future... well except Hermione Granger yeeting the crystal ball off the table',
                     `I believe the most likely outcome will be our collective demise. \n- Not if we strictly follow the rules of time travel. All right? It means no talking to our past selves... no betting on sporting events. \n- I'm gonna stop you right there, Scott. Are you seriously telling me that your plan to save the universe... is based on Back to the Future? Is it? \n- No. \n- Good. You had me worried there. 'Cause that would be horseshit. That's not how quantum physics works.`,
                     '', // Avengers: Endgame quote on Back to the future being BS
-                    '', // Back to the future quote on interacting with your future self
+                    `Jennifer could conceivably encounter her future self! The consequences could be disastrous! \n- What do you mean?\n- I foresee two possibilities. One, seeing herself 30 years older would put her into shock, and she'd pass out... or two, the encounter could create a time paradox ...and cause a chain reaction that would unravel ...the space-time continuum and destroy the entire universe! Granted, that's a worst-case scenario. The destruction might be localized, limited to our own galaxy.`, // Back to the future quote on interacting with your future self
                     'You are under arrest for crimes against the Sacred Timeline',
                     'Welcome to the TVA', // Loki Season 1 Episode 1 Ms. Minute quote from introduction at TVA
                     '', // Some Interstellar quote on time
