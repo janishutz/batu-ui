@@ -224,7 +224,7 @@
                 const errors = [
                     'Nice job, diviner, you just predicted the future. But since we are not at Hogwarts School of Witchcraft and Wizardry, we do not believe in this subject... They do not even really',
                     'I see you think you have the inner eye. No magical creature can stop you from predicting the future... well except Hermione Granger yeeting the crystal ball off the table',
-                    `I believe the most likely outcome will be our collective demise. - Not if we strictly follow the rules of time travel. All right? It means no talking to our past selves... no betting on sporting events. - I'm gonna stop you right there, Scott. Are you seriously telling me that your plan to save the universe... is based on Back to the Future? Is it? - No. - Good. You had me worried there. 'Cause that would be horseshit. That's not how quantum physics works.`,
+                    `I believe the most likely outcome will be our collective demise. \n- Not if we strictly follow the rules of time travel. All right? It means no talking to our past selves... no betting on sporting events. \n- I'm gonna stop you right there, Scott. Are you seriously telling me that your plan to save the universe... is based on Back to the Future? Is it? \n- No. \n- Good. You had me worried there. 'Cause that would be horseshit. That's not how quantum physics works.`,
                     '', // Avengers: Endgame quote on Back to the future being BS
                     '', // Back to the future quote on interacting with your future self
                     'You are under arrest for crimes against the Sacred Timeline',
