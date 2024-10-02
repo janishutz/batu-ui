@@ -17,7 +17,7 @@
     }
 
     const maxWidth = ref( window.innerWidth ); // TODO: Update to reflect slider width
-    const sliderOffset = -11;
+    const sliderOffset = -10;
     const sliderFillPosLeft = ref( sliderOffset ); // Offset from left edge
     const sliderFillPosRight = ref( maxWidth.value ); // Offset from right edge
     const sliderStops: Ref<SliderStop[]> = ref( [] );
@@ -143,7 +143,7 @@
         border-radius: 15px;
         position: absolute;
         z-index: 5;
-        top: -7px;
+        top: -5px;
         transition: left 0.5s;
     }
 
