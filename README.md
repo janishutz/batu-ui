@@ -18,8 +18,8 @@ The API is basically complete, but these things are still needed:
 - Design
 - Stats (graphs, lists or similar)
 - Cigaret animation with data analysis (data analysis could also be moved or stored on API) and skull particles
-- Submit function with data checking
-- Load old data
+- Submit function with data checking -- done
+- Load old data -- done (demo data available for October 3rd 2024, you can create your own by simply saving for a date)
 
 ### Project
 - Add CI?
