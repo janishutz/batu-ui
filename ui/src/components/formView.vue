@@ -81,26 +81,30 @@
     
     const setUpRestSlider = () => {
         setTimeout( () => {
-            restSlider.value.setUp( 7, 3 );
+            restSlider.value.setUp( 7, rest.value );
         }, 500 );
     }
 
     const setUpDifficultySlider = () => {
         setTimeout( () => {
-            difficultySlider.value.setUp( 7, 3 );
+            difficultySlider.value.setUp( 7, difficulty.value );
         }, 1000 );
     }
 
     const setUpStressSlider = () => {
         setTimeout( () => {
-            stressSlider.value.setUp( 7, 3 );
+            stressSlider.value.setUp( 7, stress.value );
         }, 1500 );
     }
 
     const setUpFreeTimeSlider = () => {
         setTimeout( () => {
-            freeTimeSlider.value.setUp( 5, 2 );
+            freeTimeSlider.value.setUp( 5, freeTime.value );
         }, 2000 );
+    }
+
+    const getDate = ( date: Date ): string => {
+        return date.toISOString().slice( 0, date.toISOString().indexOf( 'T' ) );
     }
 
     const submitForm = () => {
@@ -117,11 +121,21 @@
         }
     }
 
+    interface SaveData {
+        day: string;
+        count: number;
+        difficulty: number;
+        sleep: number;
+        rest: number;
+        freeTime: number;
+        stress: number;
+    }
+
     const sendForm = () => {
         fetch( localStorage.getItem( 'url' ) + '/update', {
             method: 'post',
             body: JSON.stringify( { 
-                day: date.value?.toISOString(),
+                day: getDate( date.value ?? new Date() ),
                 count: cigaretCount.value,
                 difficulty: difficulty.value,
                 sleep: sleepHours.value,
@@ -141,18 +155,28 @@
                 alert( `Failed to save data (${ res.status })` );
             }
         } );
-        
     }
 
     const dateUpdatedHandler = () => {
-        console.log( date.value );
         if ( date.value ) {
             if ( date.value.getTime() <= new Date().getTime() + 10000 ) {
                 hasSelectedDate.value = true;
-                // TODO: Load old data, if present
-                
-                if ( oldData[ date.value.toISOString() ] ) {
-                    // TODO: Finish
+                // Load old data, if present
+                if ( oldData[ getDate( date.value ) ] ) {
+                    const data = oldData[ getDate( date.value ) ];
+                    cigaretCount.value = data.count ?? 0;
+                    difficulty.value = data.difficulty ?? 3;
+                    rest.value = data.rest ?? 3;
+                    freeTime.value = data.freeTime ?? 2;
+                    sleepHours.value = data.sleep ?? 0;
+                    stress.value = data.stress ?? 3;
+                } else {
+                    cigaretCount.value = 0;
+                    difficulty.value = 3;
+                    rest.value = 3;
+                    freeTime.value = 2;
+                    sleepHours.value = 0;
+                    stress.value = 3;
                 }
             } else {
                 const errors = [
@@ -175,7 +199,7 @@
 
 
     interface OldData {
-        [key: string]: object;
+        [key: string]: SaveData;
     }
 
     let oldData: OldData = {};
