@@ -7,9 +7,7 @@ import stylistic from '@stylistic/eslint-plugin';
 export default tseslint.config(
     eslint.configs.recommended,
     ...tseslint.configs.recommended,
-    {
-        'ignores': [ '**/dist/', '**/*.cjs' ],
-    },
+    { 'ignores': [ '**/dist/', '**/*.cjs' ], },
     {
         'plugins': {
             '@stylistic/js': stylistic,
@@ -23,7 +21,7 @@ export default tseslint.config(
             '@stylistic/js/arrow-parens': [ 'error', 'always' ],
             '@stylistic/js/arrow-spacing': [ 'error', { 'before': true, 'after': true } ],
             '@stylistic/js/block-spacing': [ 'error', 'always' ],
-            '@stylistic/js/brace-style': [ 'error', '1tbs' ],
+            // '@stylistic/js/brace-style': [ 'error', '1tbs' ],
             '@stylistic/js/comma-spacing': [ 'error', { 'before': false, 'after': true } ],
             '@stylistic/js/comma-style': [ 'error', 'last' ],
             '@stylistic/js/dot-location': [ 'error', 'property' ],

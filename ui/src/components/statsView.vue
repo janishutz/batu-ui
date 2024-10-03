@@ -43,6 +43,7 @@
         transform-origin: center;
         transform: scale(0);
         transition: all 0.5s;
+        z-index: 50;
     }
 
     .stats-view-shown {

@@ -11,9 +11,7 @@ if ( typeof __dirname === 'undefined' ) {
 }
 
 declare module 'express-session' {
-    interface SessionData {
- 'isAuth': boolean;
-    }
+    interface SessionData { 'isAuth': boolean; }
 }
 
 const run = () => {
@@ -30,7 +28,6 @@ const run = () => {
     } ) );
     app.set( 'trust proxy', 1 );
 
-    app.use( bodyParser.urlencoded( { 'extended': false } ) );
     app.use( bodyParser.json() );
 
 
@@ -62,6 +59,7 @@ const run = () => {
             let data = {};
             try {
                 data = JSON.parse( '' + fs.readFileSync( path.join( __dirname + '/data/batu.json' ) ) );
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch ( err ) { /* empty */ }
             response.send( data );
         } else {
@@ -83,12 +81,23 @@ const run = () => {
                 stressLevel: number;
             */
 
-            if ( body.count && body.day && body.difficulty ) {
+            if ( body.count !== undefined && body.day !== undefined && body.difficulty !== undefined ) {
                 let data = {};
                 try {
                     data = JSON.parse( '' + fs.readFileSync( path.join( __dirname + '/data/batu.json' ) ) );
-                } catch ( err ) { /* empty */ }
-                data[ body.day ] = '';
+                } catch ( err ) {
+                    console.error( err );
+                    response.status( 500 ).send( 'ERR_STORING' );
+                    return;
+                }
+                data[ body.day ] = body;
+                try {
+                    fs.writeFileSync( path.join( __dirname + '/data/batu.json' ), JSON.stringify( data ) );
+                } catch ( err ) {
+                    console.error( err );
+                    response.status( 500 ).send( 'ERR_STORING' );
+                    return;
+                }
                 response.send( 'stored' );
             } else {
                 response.status( 400 ).send( 'ERR_INVALID_REQ' );

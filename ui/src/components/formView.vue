@@ -118,7 +118,30 @@
     }
 
     const sendForm = () => {
-        alert( 'Data submitted. Remember: Stop smoking! Smoking hurts your health!' );
+        fetch( localStorage.getItem( 'url' ) + '/update', {
+            method: 'post',
+            body: JSON.stringify( { 
+                day: date.value?.toISOString(),
+                count: cigaretCount.value,
+                difficulty: difficulty.value,
+                sleep: sleepHours.value,
+                rest: rest.value,
+                freeTime: freeTime.value,
+                stress: stress.value
+            } ),
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'charset': 'utf-8'
+            }
+        } ).then( res => {
+            if ( res.status === 200 ) {
+                alert( 'Data submitted. Remember: Stop smoking! Smoking hurts your health!' ); 
+            } else {
+                alert( `Failed to save data (${ res.status })` );
+            }
+        } );
+        
     }
 
     const dateUpdatedHandler = () => {
