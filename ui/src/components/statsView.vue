@@ -30,7 +30,7 @@
 <style scoped>
     .stats-view {
         position: fixed;
-        top: 0;
+        top: 100vh;
         left: 0;
         width: 100%;
         height: 100%;
@@ -40,14 +40,12 @@
         /* TODO: Remove next line to have items top-aligned */
         justify-content: center; 
         flex-direction: column;
-        transform-origin: center;
-        transform: scale(0);
         transition: all 0.5s;
         z-index: 50;
     }
 
     .stats-view-shown {
-        transform: scale(1);
+        top: 0;
     }
 
     .close-stats {

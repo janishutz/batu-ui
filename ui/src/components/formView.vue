@@ -216,7 +216,7 @@
         <div v-if="hasSelectedDate" class="main-interface">
 
             <div class="input-element">
-                <p>How many cigarets did you smoke on that day?</p>
+                <p>How many cigarettes did you smoke on that day?</p>
                 <input type="number" class="input" v-model="cigaretCount">
             </div>
             
