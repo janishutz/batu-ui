@@ -238,12 +238,6 @@
         </div>
 
         <div v-if="hasSelectedDate" class="main-interface">
-
-            <div class="input-element">
-                <p>How many cigarettes did you smoke on that day?</p>
-                <input type="number" class="input" v-model="cigaretCount">
-            </div>
-            
             <div class="input-element">
                 <p>How many hours of sleep did you get approximately?</p>
                 <input type="number" class="input" v-model="sleepHours">
@@ -267,6 +261,12 @@
             <div class="input-element">
                 <p>That day, I had {{ freeTime >= 0 ? freeTimeLevels[ freeTime ] : '...' }}</p>
                 <stopSlider slider-id="freeTime" style="width: 50vw;" @slider-pos="( pos ) => setFreeTime( pos )" ref="freeTimeSlider" @ready="setUpFreeTimeSlider()"></stopSlider>
+            </div>
+
+            <div class="input-element">
+                <p>How many cigarettes did you smoke on that day?</p>
+                <input type="number" class="input" v-model="cigaretCount">
+                <i>Prediction: coming soon<sup>TM</sup></i>
             </div>
             <button @click="submitForm()" class="fancy-button" style="margin-top: 20px;">Submit</button>
         </div>
