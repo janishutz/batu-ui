@@ -16,6 +16,10 @@ declare module 'express-session' {
 
 const run = () => {
     const app = express();
+    const pw = '' + fs.readFileSync( path.join( __dirname + '/data/pw.txt' ) );
+
+    app.use( express.static( path.join( __dirname + '/ui' ) ) );
+
     app.use( expressSession( {
         'secret': 'oasdvövböoweivaöiewväiweväowecäievwoaweävciwecfwegifwp9uiqc32p9qc',
         'resave': true,
@@ -32,7 +36,7 @@ const run = () => {
 
 
     app.post( '/unlock', ( request, response ) => {
-        if ( request.body.password === 'stop smoking!' ) {
+        if ( request.body.password === pw ) {
             request.session.isAuth = true;
             response.send( 'ok' );
         } else {
